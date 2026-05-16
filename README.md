@@ -92,6 +92,277 @@ CodeFlow AI leverages Bob's purpose-built modes that optimize behavior for diffe
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## 🔌 How IBM Bob Powers CodeFlow AI
+
+CodeFlow AI deeply integrates IBM Bob throughout the entire development workflow. Here's how Bob is utilized in this project:
+
+### 1. **Repository Analysis & Understanding**
+
+When you connect a repository, Bob immediately goes to work:
+
+```javascript
+// backend/src/services/bobService.js
+async analyzeRepository(repositoryData) {
+  const prompt = `Analyze this repository and provide:
+    1. Architecture overview
+    2. Key modules and their purposes
+    3. Technology stack
+    4. Project structure insights
+    
+    Repository: ${repositoryData.name}
+    Language: ${repositoryData.language}
+    Files: ${repositoryData.fileCount}`;
+  
+  return await this.sendRequest(prompt, 'ask', {
+    repository: repositoryData
+  });
+}
+```
+
+**Bob's Role**: Uses **Ask Mode** to understand the codebase structure, identify patterns, and generate comprehensive architecture summaries.
+
+### 2. **Code Explanation & Documentation**
+
+Bob explains complex code in simple terms:
+
+```javascript
+// API Endpoint: POST /api/bob/explain
+async explainCode(code, language, context) {
+  const prompt = `Explain this ${language} code in simple terms:
+    
+    ${code}
+    
+    Context: ${context}`;
+  
+  return await this.sendRequest(prompt, 'ask', {
+    code, language, context
+  });
+}
+```
+
+**Bob's Role**: Uses **Ask Mode** to break down complex logic, explain design patterns, and help developers understand unfamiliar code.
+
+### 3. **Automatic Documentation Generation**
+
+Bob generates comprehensive documentation:
+
+```javascript
+// API Endpoint: POST /api/bob/document
+async generateDocumentation(filePath, code, language) {
+  const prompt = `Generate comprehensive documentation for this ${language} file:
+    
+    File: ${filePath}
+    Code: ${code}
+    
+    Include:
+    - Function/class descriptions
+    - Parameter explanations
+    - Return value documentation
+    - Usage examples`;
+  
+  return await this.sendRequest(prompt, 'code', {
+    filePath, code, language
+  });
+}
+```
+
+**Bob's Role**: Uses **Code Mode** to create inline comments, JSDoc/docstrings, and README files with proper formatting.
+
+### 4. **Test Generation & Quality Assurance**
+
+Bob creates comprehensive test suites:
+
+```javascript
+// API Endpoint: POST /api/bob/generate-tests
+async generateTests(code, language, framework) {
+  const prompt = `Generate unit tests for this ${language} code using ${framework}:
+    
+    ${code}
+    
+    Include:
+    - Happy path tests
+    - Edge cases
+    - Error handling
+    - Mock data`;
+  
+  return await this.sendRequest(prompt, 'code', {
+    code, language, framework, testFramework: framework
+  });
+}
+```
+
+**Bob's Role**: Uses **Code Mode** to generate test cases, identify edge cases, and create mock data for comprehensive testing.
+
+### 5. **Code Refactoring & Improvements**
+
+Bob suggests intelligent refactoring:
+
+```javascript
+// API Endpoint: POST /api/bob/refactor
+async suggestRefactoring(code, language, context) {
+  const prompt = `Analyze this ${language} code and suggest refactoring improvements:
+    
+    ${code}
+    
+    Focus on:
+    - Code readability
+    - Performance optimization
+    - Best practices
+    - Design patterns
+    
+    Context: ${context}`;
+  
+  return await this.sendRequest(prompt, 'code', {
+    code, language, context
+  });
+}
+```
+
+**Bob's Role**: Uses **Code Mode** to identify code smells, suggest improvements, and provide refactored versions following best practices.
+
+### 6. **Interactive Chat with Full Context**
+
+Bob maintains conversational context across multiple interactions:
+
+```javascript
+// backend/src/models/ChatSession.js
+const chatSessionSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  repository: { type: mongoose.Schema.Types.ObjectId, ref: 'Repository' },
+  title: { type: String, required: true },
+  messages: [{
+    role: { type: String, enum: ['user', 'assistant'], required: true },
+    content: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    metadata: {
+      mode: String,
+      tools_used: [String],
+      context: mongoose.Schema.Types.Mixed
+    }
+  }],
+  context: {
+    mode: { type: String, default: 'ask' },
+    repository_context: mongoose.Schema.Types.Mixed,
+    conversation_summary: String
+  }
+});
+```
+
+**Bob's Role**: Maintains conversation history, switches modes dynamically, and provides context-aware responses based on the entire repository.
+
+### 7. **Mode-Specific Capabilities**
+
+Bob adapts to different development scenarios:
+
+```javascript
+// backend/src/services/bobService.js
+getToolsForMode(mode) {
+  const toolsByMode = {
+    code: ['read_file', 'write_to_file', 'apply_diff', 'execute_command'],
+    ask: ['read_file', 'search_files', 'list_files'],
+    plan: ['read_file', 'list_files', 'write_to_file'],
+    advanced: ['read_file', 'write_to_file', 'execute_command', 'search_files'],
+    orchestrator: ['read_file', 'write_to_file', 'execute_command', 'search_files', 'apply_diff']
+  };
+  return toolsByMode[mode] || toolsByMode.ask;
+}
+```
+
+**Bob's Modes in Action**:
+- **Code Mode**: Direct file modifications, code generation, refactoring
+- **Ask Mode**: Questions, explanations, documentation queries
+- **Plan Mode**: Architecture design, task breakdown, technical specifications
+- **Advanced Mode**: Complex refactoring, multi-file changes, integrations
+- **Orchestrator Mode**: Large features, system redesigns, workflow automation
+
+### 8. **Real-Time Collaboration**
+
+Frontend components interact with Bob seamlessly:
+
+```javascript
+// frontend/src/store/slices/chatSlice.js
+export const sendMessage = createAsyncThunk(
+  'chat/sendMessage',
+  async ({ sessionId, message }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/chat/sessions/${sessionId}/messages`, {
+        message
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+```
+
+**Bob's Role**: Provides instant responses through the chat interface, maintaining context and adapting to user needs in real-time.
+
+### 9. **Repository Context Awareness**
+
+Bob understands the entire repository structure:
+
+```javascript
+// backend/src/services/repositoryService.js
+async parseRepository(repoPath) {
+  const files = [];
+  const parseDirectory = async (dirPath) => {
+    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+    
+    for (const entry of entries) {
+      const fullPath = path.join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        await parseDirectory(fullPath);
+      } else {
+        const content = await fs.readFile(fullPath, 'utf-8');
+        files.push({
+          path: path.relative(repoPath, fullPath),
+          content,
+          language: this.detectLanguage(entry.name)
+        });
+      }
+    }
+  };
+  
+  await parseDirectory(repoPath);
+  return files;
+}
+```
+
+**Bob's Role**: Analyzes the complete file structure, understands relationships between modules, and provides context-aware suggestions.
+
+### 10. **Continuous Learning & Adaptation**
+
+Bob learns from interactions and improves over time:
+
+```javascript
+// Chat context updates with each interaction
+async updateChatContext(sessionId, newContext) {
+  await ChatSession.findByIdAndUpdate(sessionId, {
+    $set: {
+      'context.conversation_summary': newContext.summary,
+      'context.repository_context': newContext.repository,
+      'context.mode': newContext.mode
+    }
+  });
+}
+```
+
+**Bob's Role**: Maintains conversation history, learns from previous interactions, and provides increasingly relevant suggestions.
+
+## 🎯 Bob Integration Benefits
+
+By integrating IBM Bob throughout CodeFlow AI, developers gain:
+
+✅ **Instant Code Understanding**: Bob explains any code snippet in seconds
+✅ **Automated Documentation**: Generate comprehensive docs without manual writing
+✅ **Intelligent Testing**: Create test suites that cover edge cases automatically
+✅ **Smart Refactoring**: Get improvement suggestions based on best practices
+✅ **Context-Aware Assistance**: Bob understands your entire codebase
+✅ **Multi-Mode Flexibility**: Switch between modes for different tasks
+✅ **Productivity Boost**: Automate repetitive tasks and focus on creative work
+✅ **Learning Tool**: Understand unfamiliar codebases quickly
+
 ## 🚀 Quick Start
 
 ### Prerequisites
