@@ -1,0 +1,66 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the file
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to validate file size (max 100MB)
+    function isValidSize() {
+      return request.resource.size < 100 * 1024 * 1024;
+    }
+    
+    // Helper function to validate file type for uploads
+    function isValidFileType() {
+      return request.resource.contentType.matches('application/zip') ||
+             request.resource.contentType.matches('application/x-zip-compressed') ||
+             request.resource.contentType.matches('text/.*') ||
+             request.resource.contentType.matches('application/json') ||
+             request.resource.contentType.matches('application/javascript');
+    }
+    
+    // User uploads (ZIP files, etc.)
+    match /uploads/{userId}/{fileName} {
+      // Users can read their own uploads
+      allow read: if isOwner(userId);
+      // Users can upload files (with size and type validation)
+      allow write: if isOwner(userId) && isValidSize() && isValidFileType();
+      // Users can delete their own uploads
+      allow delete: if isOwner(userId);
+    }
+    
+    // Repository files
+    match /repositories/{userId}/{repoId}/{allPaths=**} {
+      // Users can read their own repository files
+      allow read: if isOwner(userId);
+      // Users can write to their own repository files
+      allow write: if isOwner(userId) && isValidSize();
+      // Users can delete their own repository files
+      allow delete: if isOwner(userId);
+    }
+    
+    // User profile images
+    match /profiles/{userId}/{fileName} {
+      // Anyone authenticated can read profile images
+      allow read: if isAuthenticated();
+      // Users can only upload their own profile images
+      allow write: if isOwner(userId) && 
+                      request.resource.size < 5 * 1024 * 1024 && // Max 5MB
+                      request.resource.contentType.matches('image/.*');
+      // Users can delete their own profile images
+      allow delete: if isOwner(userId);
+    }
+    
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

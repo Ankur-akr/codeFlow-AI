@@ -1,0 +1,8 @@
+# Netlify Redirects File
+# Place this in frontend/public/_redirects
+
+# SPA fallback - redirect all routes to index.html
+/*    /index.html   200
+
+# API proxy to backend (update with your backend URL)
+/api/*  https://your-backend-url.herokuapp.com/api/:splat  200
