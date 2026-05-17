@@ -52,7 +52,7 @@ services:
     staticPublishPath: build
     envVars:
       - key: REACT_APP_API_URL
-        value: https://codeflow-ai-backend.onrender.com
+        value: https://codeflow-ai-wyrj.onrender.com
       - key: REACT_APP_GITHUB_CLIENT_ID
         sync: false
       - key: REACT_APP_NAME

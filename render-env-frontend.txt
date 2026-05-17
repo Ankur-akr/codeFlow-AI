@@ -1,0 +1,70 @@
+# ============================================
+# CodeFlow AI - Frontend Environment Variables for Render
+# ============================================
+# Copy and paste these into Render Dashboard > Environment tab
+# Replace all values starting with "your_" with actual values
+# DO NOT commit this file with real values to Git!
+
+# ============================================
+# REQUIRED - API Configuration
+# ============================================
+# Your Render backend URL (update after backend is deployed)
+REACT_APP_API_URL=https://codeflow-ai-backend.onrender.com
+
+# ============================================
+# REQUIRED - Application Info
+# ============================================
+REACT_APP_NAME=CodeFlow AI
+REACT_APP_VERSION=1.0.0
+
+# ============================================
+# OPTIONAL - GitHub OAuth (for display purposes)
+# ============================================
+# Same client ID as backend (for OAuth button display)
+REACT_APP_GITHUB_CLIENT_ID=your_github_oauth_client_id
+
+# ============================================
+# OPTIONAL - Firebase Configuration (if using Firebase)
+# ============================================
+# Get from Firebase Console > Project Settings > General
+# https://console.firebase.google.com/
+
+REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your-project-id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+REACT_APP_FIREBASE_APP_ID=your_firebase_app_id
+REACT_APP_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+
+# ============================================
+# INSTRUCTIONS FOR RENDER:
+# ============================================
+# 1. Go to https://dashboard.render.com
+# 2. Click on your frontend service (codeflow-ai or codeflow-ai-frontend)
+# 3. Click "Environment" in the left sidebar
+# 4. For each variable above:
+#    - Click "Add Environment Variable"
+#    - Copy the KEY (left side)
+#    - Copy the VALUE (right side, replace your_* with actual values)
+#    - Click "Save Changes"
+# 5. Service will automatically rebuild and redeploy
+#
+# IMPORTANT NOTES:
+# - All React environment variables MUST start with REACT_APP_
+# - Update REACT_APP_API_URL with your actual backend URL
+# - Firebase variables are optional (only if using Firebase)
+# - Frontend will rebuild when environment variables change
+# ============================================
+
+# ============================================
+# QUICK SETUP (Minimum Required):
+# ============================================
+# If you want to get started quickly, you only need these 3:
+#
+# REACT_APP_API_URL=https://codeflow-ai-backend.onrender.com
+# REACT_APP_NAME=CodeFlow AI
+# REACT_APP_VERSION=1.0.0
+#
+# Add others as needed for additional features
+# ============================================

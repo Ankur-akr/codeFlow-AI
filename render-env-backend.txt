@@ -1,0 +1,76 @@
+# ============================================
+# CodeFlow AI - Backend Environment Variables for Render
+# ============================================
+# Copy and paste these into Render Dashboard > Environment tab
+# Replace all values starting with "your_" with actual values
+# DO NOT commit this file with real values to Git!
+
+# ============================================
+# REQUIRED - Server Configuration
+# ============================================
+NODE_ENV=production
+PORT=5000
+
+# ============================================
+# REQUIRED - Database Configuration
+# ============================================
+# Get from MongoDB Atlas: https://cloud.mongodb.com
+# Format: mongodb+srv://username:password@cluster.mongodb.net/database
+MONGODB_URI=mongodb+srv://your_username:your_password@your_cluster.mongodb.net/codeflow?retryWrites=true&w=majority
+
+# ============================================
+# REQUIRED - Session Secret
+# ============================================
+# Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+# Or let Render auto-generate by leaving blank and using "Generate Value" button
+SESSION_SECRET=your_random_secret_key_minimum_32_characters_long
+
+# ============================================
+# REQUIRED - Frontend URL
+# ============================================
+# Your Render frontend URL (update after frontend is deployed)
+FRONTEND_URL=https://codeflow-ai.onrender.com
+
+# ============================================
+# REQUIRED - IBM Bob Configuration
+# ============================================
+# Get from IBM Bob dashboard
+BOB_API_KEY=your_ibm_bob_api_key_here
+BOB_API_ENDPOINT=https://bob-api.ibm.com
+BOB_MODEL=bob-default
+
+# ============================================
+# OPTIONAL - GitHub OAuth (if using GitHub login)
+# ============================================
+# Get from: https://github.com/settings/developers
+# Create new OAuth App with callback URL: https://your-backend.onrender.com/api/auth/github/callback
+GITHUB_CLIENT_ID=your_github_oauth_client_id
+GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
+GITHUB_CALLBACK_URL=https://codeflow-ai-backend.onrender.com/api/auth/github/callback
+
+# ============================================
+# OPTIONAL - File Upload Configuration
+# ============================================
+UPLOAD_DIR=./uploads
+MAX_FILE_SIZE=104857600
+
+# ============================================
+# INSTRUCTIONS FOR RENDER:
+# ============================================
+# 1. Go to https://dashboard.render.com
+# 2. Click on your backend service (codeflow-ai-backend)
+# 3. Click "Environment" in the left sidebar
+# 4. For each variable above:
+#    - Click "Add Environment Variable"
+#    - Copy the KEY (left side)
+#    - Copy the VALUE (right side, replace your_* with actual values)
+#    - Click "Save Changes"
+# 5. Service will automatically redeploy after saving
+#
+# IMPORTANT NOTES:
+# - Replace ALL "your_*" placeholders with real values
+# - Keep SESSION_SECRET secure and random (32+ characters)
+# - Update FRONTEND_URL after deploying frontend
+# - Update GITHUB_CALLBACK_URL with your actual backend URL
+# - MongoDB URI must include username, password, and database name
+# ============================================
